@@ -3,9 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <title>Rootrix Crew</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: url('https://i.ibb.co/jz1WZgp/pixel-city.gif') center/cover no-repeat;
+      color: #00ffcc;
+      font-family: 'Press Start 2P', cursive;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Scanline effect */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.2) 0px,
+        rgba(0,0,0,0.2) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      pointer-events: none;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      text-shadow: 0 0 8px #0ff, 0 0 16px #0ff;
+      animation: glitch 1.5s infinite;
+    }
+
+    h2 {
+      font-family: 'DotGothic16', sans-serif;
+      color: #ff4de6;
+      font-size: 1.5rem;
+      margin-top: 10px;
+      text-shadow: 0 0 6px #ff4de6;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 red, -2px 0 blue; }
+      20% { text-shadow: -2px 0 red, 2px 0 blue; }
+      40% { text-shadow: 2px 2px red, -2px -2px blue; }
+      60% { text-shadow: -2px -2px red, 2px 2px blue; }
+      80% { text-shadow: 2px -2px red, -2px 2px blue; }
+      100% { text-shadow: none; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to Rootrix Crew</h1>
-  <p>This is our GitHub Pages site 🚀</p>
+  <h1>Rootrix Crew</h1>
+  <h2>ルートリックス</h2>
 </body>
 </html>
