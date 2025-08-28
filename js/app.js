@@ -84,7 +84,7 @@ class RootrixApp {
   async handleSignOut() {
     const result = await authManager.signOut();
     if (result.success) {
-      this.showNotification("Logged out successfully! 👋", "info");
+      this.showNotification("Logged out successfully!", "info");
     } else {
       this.showNotification("Error signing out: " + result.error, "error");
     }
@@ -99,7 +99,7 @@ class RootrixApp {
     this.loadAchievements();
     this.loadEvents(); // Add this line to load events
     this.setupAdminModals();
-    console.log("🌸 Rootrix Crew website initialized successfully!");
+    console.log(" Rootrix Crew website initialized successfully!");
   }
 
   setupEventListeners() {
@@ -200,7 +200,7 @@ class RootrixApp {
       await this.loadWriteups();
       await this.loadWriteupsList();
       document.getElementById("addWriteupForm").reset();
-      this.showNotification("Writeup added successfully! ✅", "achievement");
+      this.showNotification("Writeup added successfully!", "achievement");
     } catch (error) {
       console.error("Error adding writeup:", error);
       this.showNotification("Error adding writeup: " + error.message, "error");
@@ -245,7 +245,7 @@ class RootrixApp {
       await this.loadEvents();
       await this.loadEventsList();
       document.getElementById("addEventForm").reset();
-      this.showNotification("Event added successfully! ✅", "achievement");
+      this.showNotification("Event added successfully!", "achievement");
     } catch (error) {
       console.error("Error adding event:", error);
       this.showNotification("Error adding event: " + error.message, "error");
