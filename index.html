@@ -1,66 +1,661 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Rootrix Crew</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background: url('./bg.gif') center/cover no-repeat;
-      color: #00ffcc;
-      font-family: 'Press Start 2P', cursive;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    /* Scanline effect */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.2) 0px,
-        rgba(0,0,0,0.2) 2px,
-        transparent 2px,
-        transparent 4px
-      );
-      pointer-events: none;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      text-shadow: 0 0 8px #0ff, 0 0 16px #0ff;
-      animation: glitch 1.5s infinite;
-    }
-
-    h2 {
-      font-family: 'DotGothic16', sans-serif;
-      color: #ff4de6;
-      font-size: 1.5rem;
-      margin-top: 10px;
-      text-shadow: 0 0 6px #ff4de6;
-    }
-
-    @keyframes glitch {
-      0% { text-shadow: 2px 0 red, -2px 0 blue; }
-      20% { text-shadow: -2px 0 red, 2px 0 blue; }
-      40% { text-shadow: 2px 2px red, -2px -2px blue; }
-      60% { text-shadow: -2px -2px red, 2px 2px blue; }
-      80% { text-shadow: 2px -2px red, -2px 2px blue; }
-      100% { text-shadow: none; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://r2cdn.perplexity.ai">
+    <title>Rootrix Crew | Elite CTF Team</title>
+    <link rel="icon" href="public/logo.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Source+Code+Pro:wght@300;400;600&family=GFS+Didot&display=swap"
+        rel="stylesheet">
 </head>
 <body>
-  <h1>Rootrix Crew</h1>
-  <h1> Site in Development <h1>
-  <h2>ルートリックス</h2>
+    <!-- Notification Container -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Admin Tools Navigation (Hidden by default) -->
+<nav class="admin-nav" id="adminNav" style="display: none;">
+  <div class="admin-nav-content">
+    <span class="admin-title">Admin Tools</span>
+    <button class="admin-btn" onclick="app.openHallOfFameEditor()">Manage Achievements</button>
+    <button class="admin-btn" onclick="app.openWriteupEditor()">Manage Writeups</button>
+    <button class="admin-btn" onclick="app.openEventsEditor()">Manage Events</button>
+    <button class="admin-btn" onclick="app.handleSignOut()">Sign Out</button>
+  </div>
+</nav>
+
+    <!-- Hall of Fame Editor Modal -->
+    <div class="hof-editor-modal" id="hofEditorModal" style="display: none;">
+        <div class="hof-editor-content">
+            <span class="hof-close">&times;</span>
+            <h2>Hall of Fame Manager</h2>
+
+            <!-- Add New Achievement Form -->
+            <div class="hof-add-section">
+                <h3>Add New Achievement</h3>
+                <form id="addAchievementForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="achievementTitle" class="form-label">Title:</label>
+                            <input type="text" id="achievementTitle" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="achievementPlace" class="form-label">Place/Position:</label>
+                            <input type="text" id="achievementPlace" class="form-control"
+                                placeholder="e.g., 1st Place, Winner, etc.">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="achievementIcon" class="form-label">Icon:</label>
+                            <select id="achievementIcon" class="form-control" required>
+                                <option value="🏆">🏆 Gold Trophy</option>
+                                <option value="🥈">🥈 Silver Trophy</option>
+                                <option value="🥉">🥉 Bronze Trophy</option>
+                                <option value="🛡️">🛡️ Security Badge</option>
+                                <option value="📚">📚 Knowledge Badge</option>
+                                <option value="👥">👥 Community Badge</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="achievementDate" class="form-label">Date:</label>
+                            <input type="text" id="achievementDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievementDescription" class="form-label">Description:</label>
+                        <textarea id="achievementDescription" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn--primary">Add Achievement</button>
+                </form>
+            </div>
+
+            <!-- Existing Achievements List -->
+            <div class="hof-list-section">
+                <h3>Existing Achievements</h3>
+                <div id="achievementsList"></div>
+            </div>
+        </div>
+    </div>
+<div class="events-editor-modal" id="eventsEditorModal" style="display: none;">
+    <div class="events-editor-content">
+        <span class="events-close">&times;</span>
+        <h2>Events Manager</h2>
+
+        <!-- Add New Event Form -->
+        <div class="events-add-section">
+            <h3>Add New Event</h3>
+            <form id="addEventForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eventTitle" class="form-label">Title:</label>
+                        <input type="text" id="eventTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDate" class="form-label">Date:</label>
+                        <input type="text" id="eventDate" class="form-control" placeholder="e.g., Oct 15, 2025" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription" class="form-label">Description:</label>
+                    <textarea id="eventDescription" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn--primary">Add Event</button>
+            </form>
+        </div>
+
+        <!-- Existing Events List -->
+        <div class="events-list-section">
+            <h3>Existing Events</h3>
+            <div id="eventsList"></div>
+        </div>
+    </div>
+</div>
+<!-- Writeup Editor Modal -->
+<div class="writeup-editor-modal" id="writeupEditorModal" style="display: none;">
+    <div class="writeup-editor-content">
+        <span class="writeup-close">&times;</span>
+        <h2>Writeups Manager</h2>
+
+        <!-- Add New Writeup Form -->
+        <div class="writeup-add-section">
+            <h3>Add New Writeup</h3>
+            <form id="addWriteupForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="writeupTitle" class="form-label">Title:</label>
+                        <input type="text" id="writeupTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="writeupType" class="form-label">Type:</label>
+                        <select id="writeupType" class="form-control" required>
+                            <option value="CTF">CTF</option>
+                            <option value="PoC">PoC</option>
+                            <option value="Knowledge">Knowledge</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="writeupTopic" class="form-label">Topic:</label>
+                        <select id="writeupTopic" class="form-control" required>
+                            <option value="Web Exploit">Web Exploit</option>
+                            <option value="Reverse">Reverse</option>
+                            <option value="OSINT">OSINT</option>
+                            <option value="Mobile">Mobile</option>
+                            <option value="Crypto">Cryptography</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="writeupUrl" class="form-label">Writeup URL:</label>
+                        <input type="url" id="writeupUrl" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="writeupDescription" class="form-label">Description:</label>
+                    <textarea id="writeupDescription" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn--primary">Add Writeup</button>
+            </form>
+        </div>
+
+        <!-- Existing Writeups List -->
+        <div class="writeup-list-section">
+            <h3>Existing Writeups</h3>
+            <div id="writeupsList"></div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Sakura Petals Container -->
+    <div class="sakura-container" id="sakuraContainer"></div>
+
+    <!-- Matrix Rain Background -->
+    <div class="matrix-rain" id="matrixRain"></div>
+
+    <!-- Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-logo">
+                <div class="pixel-logo">
+                    <span class="logo-text">ROOTRIX</span>
+                    <span class="logo-sub">CREW</span>
+                </div>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link active" onclick="smoothParallaxScrollTo('home'); return false;">Home</a></li>
+                <li><a href="#about" class="nav-link" onclick="smoothParallaxScrollTo('about'); return false;">About</a></li>
+                <li><a href="#achievements" class="nav-link" onclick="smoothParallaxScrollTo('achievements'); return false;">Achievements</a></li>
+                <li><a href="#blog" class="nav-link" onclick="smoothParallaxScrollTo('blog'); return false;">Blog</a></li>
+                <li><a href="#join" class="nav-link" onclick="smoothParallaxScrollTo('join'); return false;">Events</a></li>
+                <li><a href="/html/login.html" id="authLink" class="nav-link">Sign In</a></li>
+            </ul>
+            <div class="nav-toggle" id="navToggle">
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-bg">
+                <div class="parallax-layer layer-1"></div>
+                <div class="parallax-layer layer-2"></div>
+                <div class="parallax-layer layer-3"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="glitch-text" data-text="ROOTRIX CREW">ROOTRIX CREW</span>
+                </h1>
+                <p class="hero-motto">Hack the Planet, One Root at a Time</p>
+                <p class="hero-description">Elite CTF team pushing the boundaries of cybersecurity</p>
+<button class="cta-button" onclick="smoothParallaxScrollTo('about')">Enter the Matrix</button>
+
+            </div>
+            <div class="floating-elements">
+                <div class="floating-code">buffer[256]</div>
+                <div class="floating-code">' OR 1=1--</div>
+                <div class="floating-code">uid=0(root)</div>
+                <div class="floating-code">{{7*7}}</div>
+                <div class="floating-code">flag{}</div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title">
+                    <span class="pixel-text">About Our Crew</span>
+                </h2>
+
+                <div class="team-grid">
+                    <!-- R7X_Dyn4m0 -->
+                    <div class="team-member" data-member="0">
+                        <div class="member-card">
+                            <div class="card-front">
+                                <div class="member-avatar">
+<img src="assets/images/DYNAMO.png" alt="R7X_Dyn4m0"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="pixel-avatar-1" style="display: none;"></div>
+                                </div>
+                                <h3 class="member-name">R7X_Dyn4m0</h3>
+                                <p class="member-role">Captain & Web Expert</p>
+                            </div>
+                            <div class="card-back">
+                                <div class="member-details">
+                                    <h4>Specialization</h4>
+                                    <p>Full-stack exploitation, web app security</p>
+                                    <div class="skill-bars">
+                                        <div class="skill-bar">
+                                            <span>Web Security</span>
+                                            <div class="skill-fill" style="width: 95%"></div>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <span>Exploitation</span>
+                                            <div class="skill-fill" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- R7X_XAIOWU -->
+                    <div class="team-member" data-member="1">
+                        <div class="member-card">
+                            <div class="card-front">
+                                <div class="member-avatar">
+<img src="assets/images/XAIWOU.png" alt="R7X_XAIOWU"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="pixel-avatar-2" style="display: none;"></div>
+                                </div>
+                                <h3 class="member-name">R7X_XAIOWU</h3>
+                                <p class="member-role">Cryptography Specialist</p>
+                            </div>
+                            <div class="card-back">
+                                <div class="member-details">
+                                    <h4>Specialization</h4>
+                                    <p>Modern & classical cryptanalysis</p>
+                                    <div class="skill-bars">
+                                        <div class="skill-bar">
+                                            <span>Cryptography</span>
+                                            <div class="skill-fill" style="width: 98%"></div>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <span>Mathematics</span>
+                                            <div class="skill-fill" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- R7X_Adr5y4 -->
+                    <div class="team-member" data-member="2">
+                        <div class="member-card">
+                            <div class="card-front">
+                                <div class="member-avatar">
+<img src="assets/images/ADRSHYA.png" alt="R7X_Adr5y4"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="pixel-avatar-3" style="display: none;"></div>
+                                </div>
+                                <h3 class="member-name">R7X_Adr5y4</h3>
+                                <p class="member-role">Forensics and OSINT</p>
+                            </div>
+                            <div class="card-back">
+                                <div class="member-details">
+                                    <h4>Specialization</h4>
+                                    <p>Digital forensics, open-source intelligence</p>
+                                    <div class="skill-bars">
+                                        <div class="skill-bar">
+                                            <span>Forensics</span>
+                                            <div class="skill-fill" style="width: 92%"></div>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <span>OSINT</span>
+                                            <div class="skill-fill" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- R7X_S4kuR4 -->
+                    <div class="team-member" data-member="3">
+                        <div class="member-card">
+                            <div class="card-front">
+                                <div class="member-avatar">
+<img src="assets/images/SAKURA.png" alt="R7X_S4kuR4"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="pixel-avatar-4" style="display: none;"></div>
+                                </div>
+                                <h3 class="member-name">R7X_S4kuR4</h3>
+                                <p class="member-role">Web Security and Reverse Expert</p>
+                            </div>
+                            <div class="card-back">
+                                <div class="member-details">
+                                    <h4>Specialization</h4>
+                                    <p>Reverse engineering, advanced web exploits</p>
+                                    <div class="skill-bars">
+                                        <div class="skill-bar">
+                                            <span>Reverse Engineering</span>
+                                            <div class="skill-fill" style="width: 94%"></div>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <span>Web Security</span>
+                                            <div class="skill-fill" style="width: 91%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- R7X_D0odl3s -->
+                    <div class="team-member" data-member="4">
+                        <div class="member-card">
+                            <div class="card-front">
+                                <div class="member-avatar">
+<img src="assets/images/DOODLES.png" alt="R7X_D0odl3s"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="pixel-avatar-1" style="display: none;"></div>
+                                </div>
+                                <h3 class="member-name">R7X_D0odl3s</h3>
+                                <p class="member-role">Mobile & OT Security Specialist</p>
+                            </div>
+                            <div class="card-back">
+                                <div class="member-details">
+                                    <h4>Specialization</h4>
+                                    <p>Mobile app exploitation, IoT & OT systems security</p>
+                                    <div class="skill-bars">
+                                        <div class="skill-bar">
+                                            <span>Mobile Security</span>
+                                            <div class="skill-fill" style="width: 93%"></div>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <span>OT/IoT Exploitation</span>
+                                            <div class="skill-fill" style="width: 89%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        <div class="team-member" data-member="4">
+                        <div class="member-card">
+                            <div class="card-front">
+                                <div class="member-avatar">
+<img src="assets/images/shawarma.jpeg" alt="R7X_5H4w4rm4"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div class="pixel-avatar-1" style="display: none;"></div>
+                                </div>
+                                <h3 class="member-name">R7X_5H4w4rm4</h3>
+                                <p class="member-role">Binary Exploitation</p>
+                            </div>
+                            <div class="card-back">
+                                <div class="member-details">
+                                    <h4>Specialization</h4>
+                                    <p>Binary exploitation & PWN</p>
+                                    <div class="skill-bars">
+                                        <div class="skill-bar">
+                                            <span>Binary Exploitation</span>
+                                            <div class="skill-fill" style="width: 93%"></div>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <span>PWN</span>
+                                            <div class="skill-fill" style="width: 89%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements Section (Dynamic) -->
+        <section id="achievements" class="achievements">
+            <div class="container">
+                <h2 class="section-title">
+                    <span class="pixel-text">Hall of Fame</span>
+                </h2>
+                <div class="achievements-grid" id="achievementsGrid">
+                    <!-- Dynamic achievements will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+  <section id="blog" class="blog">
+    <div class="container">
+      <h2 class="section-title">
+        <span class="pixel-text">Latest Writeups</span>
+      </h2>
+      <div class="blog-grid" id="writeupsGrid">
+        <!-- Writeup cards injected dynamically from Firestore -->
+      </div>
+    </div>
+  </section>
+
+        <!-- Join Section -->
+<section id="join" class="join">
+  <div class="container">
+    <h2 class="section-title">
+      <span class="pixel-text">Upcoming Events</span>
+    </h2>
+    <div class="events-grid" id="eventsGrid">
+      <!-- Dynamic event cards will load here -->
+    </div>
+    <div class="join-cta">
+            <h2 class="section-title">
+      <span class="pixel-text">Join us</span>
+    </h2>
+      <button type="button" class="btn btn--primary submit-btn"
+        onclick="window.open('https://docs.google.com/forms/d/1zYn8hc-APpw7KFLiTtzLIQ5nonLQUREAtOFtIuRvmNs/viewform', '_blank');">
+        <span>Hack In</span>
+      </button>
+    </div>
+  </div>
+  <div class="terminal" id="hiddenTerminal" style="display: none;">
+    <div class="terminal-header">
+      <span>root@rootrix:~$</span>
+      <button class="terminal-close" onclick="closeTerminal2()">×</button>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-output">
+        <p>Congratulations on discovering the konami code!</p>
+        <p>Achievement Unlocked: Matrix Master</p>
+        <p>Flag: FLAG{K0N4M1_C0D3_M4ST3R}</p>
+        <p>Keep exploring for more hidden secrets...</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+<img src="assets/images/rtx-logo.png" alt="Rootrix Logo">
+    </div>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#achievements">Achievements</a>
+      <a href="#blog">Blog</a>
+      <a href="#join">Join</a>
+    </div>
+    <div class="footer-copy">
+      &copy; 2025 Rootrix Crew | All rights reserved
+    </div>
+  </div>
+</footer>
+
+<style>
+.footer {
+  background-color: #000; /* black background */
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+  font-family: 'Source Code Pro', monospace;
+  margin-bottom: 0; /* Remove any bottom margin */
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer-logo img {
+  height: 60px;  /* adjust height to fit nicely */
+  width: auto;
+  object-fit: contain;
+}
+
+.footer-links {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #fff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.footer-links a:hover {
+  color: #00ffff; /* cyan hover effect */
+}
+
+.footer-copy {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Fix for gap between footer and end of site */
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+.main {
+  margin-bottom: 0;
+}
+</style>
+
+<!-- Konami Code Indicator -->
+<div class="konami-indicator" id="konamiIndicator">
+  <div class="konami-progress"></div>
+</div>
+
+<script>
+  function closeTerminal2() {
+    const terminal = document.getElementById("hiddenTerminal");
+    terminal.style.animation = "slideOut 0.5s ease-out";
+    setTimeout(() => {
+      terminal.style.display = "none";
+    }, 500);
+  }
+
+  // Ultra-smooth parallax scrolling function
+  function smoothParallaxScrollTo(sectionId) {
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+    
+    const headerOffset = 100;
+    const targetY = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    const startY = window.pageYOffset;
+    const distance = targetY - startY;
+    const duration = 1200;
+    let startTime = null;
+    
+    // Add highlight effect
+    target.classList.add('section-highlight');
+    
+    // Easing function (easeInOutQuad)
+    function easeInOutQuad(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+    
+    function animation(currentTime) {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+      const ease = easeInOutQuad(progress);
+      
+      window.scrollTo(0, startY + distance * ease);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animation);
+      } else {
+        // Remove highlight after animation
+        setTimeout(() => {
+          target.classList.remove('section-highlight');
+        }, 1600);
+      }
+    }
+    
+    requestAnimationFrame(animation);
+  }
+
+  // Initialize parallax effects
+  window.addEventListener('scroll', function() {
+    let scrolled = window.pageYOffset;
+    const layer1 = document.querySelector('.layer-1');
+    const layer2 = document.querySelector('.layer-2');
+    const layer3 = document.querySelector('.layer-3');
+    
+    if (layer1) layer1.style.transform = `translateY(${scrolled * 0.3}px)`;
+    if (layer2) layer2.style.transform = `translateY(${scrolled * 0.5}px)`;
+    if (layer3) layer3.style.transform = `translateY(${scrolled * 0.65}px)`;
+  });
+</script>
+<script>
+  // Mobile menu toggle
+  const navToggle = document.getElementById('navToggle');
+  const navMenu = document.getElementById('navMenu');
+
+  navToggle.addEventListener('click', () => {
+    navToggle.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+
+  // Close mobile menu when clicking on a link
+  document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
+    navToggle.classList.remove('active');
+    navMenu.classList.remove('active');
+  }));
+</script>
+<script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/firebase.js"></script>
+  <script type="module" src="/js/auth.js"></script>
 </body>
+
 </html>

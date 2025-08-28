@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rootrix Crew - Access Portal</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="icon" href="../../public/logo.svg" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="cyber-background">
+        <div class="grid-overlay"></div>
+        <div class="particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+        </div>
+        
+        <!-- Sakura Petals Background -->
+        <div class="sakura-container">
+            <div class="sakura-petal petal-1"></div>
+            <div class="sakura-petal petal-2"></div>
+            <div class="sakura-petal petal-3"></div>
+            <div class="sakura-petal petal-4"></div>
+            <div class="sakura-petal petal-5"></div>
+            <div class="sakura-petal petal-6"></div>
+            <div class="sakura-petal petal-7"></div>
+            <div class="sakura-petal petal-8"></div>
+            <div class="sakura-petal petal-9"></div>
+            <div class="sakura-petal petal-10"></div>
+            <div class="sakura-petal petal-11"></div>
+            <div class="sakura-petal petal-12"></div>
+            <div class="sakura-petal petal-13"></div>
+            <div class="sakura-petal petal-14"></div>
+            <div class="sakura-petal petal-15"></div>
+            <div class="sakura-petal petal-16"></div>
+            <div class="sakura-petal petal-17"></div>
+            <div class="sakura-petal petal-18"></div>
+        </div>
+    </div>
+
+    <div class="container" id="container">
+        <!-- Sign Up Form -->
+        <div class="form-container sign-up-container">
+            <form action="#" id="signUpForm" class="cyber-form">
+                <h1>Join the Elite</h1>
+                <div class="cyber-decoration"></div>
+                <div class="input-group">
+                    <input type="text" placeholder="Username" required id="signUpUsername">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <input type="email" placeholder="Enter your Email" required id="signUpEmail">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Enter your password" required id="signUpPassword">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="cyber-btn">
+                    <span class="btn-text">CREATE ACCOUNT</span>
+                    <span class="btn-loading hidden">
+                        <i class="fas fa-spinner fa-spin"></i> PROCESSING...
+                    </span>
+                </button>
+                <p class="form-link">Already have access? <a href="#" id="signInLink">Sign In</a></p>
+            </form>
+        </div>
+
+        <!-- Sign In Form -->
+        <div class="form-container sign-in-container">
+            <form action="#" id="signInForm" class="cyber-form">
+                <div class="logo-container">
+                    <h1 class="logo">ROOTRIX</h1>
+                    <h2 class="logo-sub">CREW</h2>
+                </div>
+                <h3 class="form-title">Access Portal</h3>
+                <div class="cyber-decoration"></div>
+                <div class="input-group">
+                    <input type="email" placeholder="Enter the Email" required id="signInEmail">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Enter your Password" required id="signInPassword">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="button" id="googleSignInBtn" class="cyber-btn btn--secondary btn--full-width" style="margin-top: 10px;">
+    <i class="fab fa-google"></i> <span>Sign in with Google</span>
+</button>
+
+                <button type="submit" class="cyber-btn">
+                    <span class="btn-text">SIGN IN</span>
+                    <span class="btn-loading hidden">
+                        <i class="fas fa-spinner fa-spin"></i> ACCESSING...
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Overlay Container -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <!-- Left Panel -->
+                <div class="overlay-panel overlay-left">
+                    <div class="overlay-content">
+                        <h1>Welcome Back!</h1>
+                        <div class="cyber-decoration-overlay"></div>
+                        <p>Re-enter the digital realm and continue your mission with Rootrix Crew. The matrix awaits your return.</p>
+                        <div class="neon-lines">
+                            <span class="line"></span>
+                            <span class="line"></span>
+                            <span class="line"></span>
+                        </div>
+                        <button class="ghost-btn" id="signInBtn">
+                            <span>SIGN IN</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="overlay-panel overlay-right">
+                    <div class="overlay-content">
+                        <h1>Join the Elite!</h1>
+                        <div class="cyber-decoration-overlay"></div>
+                        <p>Step into the cybernetic future. Become part of an exclusive collective of digital warriors and code masters.</p>
+                        <div class="neon-lines">
+                            <span class="line"></span>
+                            <span class="line"></span>
+                            <span class="line"></span>
+                        </div>
+                        <button class="ghost-btn" id="signUpBtn">
+                            <span>JOIN NOW</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/login.js"></script>
+</body>
+</html>
