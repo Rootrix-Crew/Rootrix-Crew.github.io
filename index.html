@@ -1181,9 +1181,18 @@
     }
 
     @media (max-width: 768px) {
-      .nav-inner { padding: 18px 24px; }
-      nav ul, .nav-cta { display: none; }
-      .ham { display: flex; }
+      .nav-inner { padding: 14px 20px; }
+      nav ul, .nav-cta { display: none !important; }
+      .ham { display: flex; position: relative; z-index: 50; margin-left: auto; }
+      .logo { flex-shrink: 0; }
+      .logo-mark { width: 32px; height: 32px; }
+      .logo-name { font-size: 12px; }
+      .logo-sub-text { font-size: 8px; }
+
+      /* Hide desktop nav on mobile */
+      header > .nav-inner > nav,
+      header .nav-cta { display: none; }
+
       .hero-title { font-size: clamp(40px, 12vw, 72px); }
       .members-grid { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
