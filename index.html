@@ -238,18 +238,26 @@
     }
 
     .mobile-menu {
-      display: none;
+      display: flex;
       position: fixed;
-      inset: 0; z-index: 380;
+      inset: 0; z-index: 600;
       background: rgba(10,10,10,.96);
       backdrop-filter: blur(24px);
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+      transform: translateY(-20px);
     }
 
-    .mobile-menu.open { display: flex; }
+    .mobile-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
 
     .mobile-menu a {
       font-size: clamp(28px, 6vw, 48px);
@@ -1427,13 +1435,15 @@
       </div>
     </a>
 
-    <ul>
-      <li><a href="#home"><span class="idx">01</span> Home</a></li>
-      <li><a href="#about"><span class="idx">02</span> Members</a></li>
-      <li><a href="#achievements"><span class="idx">03</span> Achievements</a></li>
-      <li><a href="#blog"><span class="idx">04</span> Writeups</a></li>
-      <li><a href="#join"><span class="idx">05</span> Events</a></li>
-    </ul>
+    <nav>
+      <ul>
+        <li><a href="#home"><span class="idx">01</span> Home</a></li>
+        <li><a href="#about"><span class="idx">02</span> Members</a></li>
+        <li><a href="#achievements"><span class="idx">03</span> Achievements</a></li>
+        <li><a href="#blog"><span class="idx">04</span> Writeups</a></li>
+        <li><a href="#join"><span class="idx">05</span> Events</a></li>
+      </ul>
+    </nav>
 
     <a href="#join" class="nav-cta" id="authLink">JOIN US</a>
 
@@ -1458,6 +1468,7 @@
 
   <!-- HERO -->
   <section id="home">
+    <div class="hero-bg" style="position: absolute; inset: 0; background: url('assets/bg.gif') center/cover; opacity: 0.15; z-index: 0; transform-origin: top;"></div>
     <div class="hero-bg-number">R7X</div>
     <div class="wrap hero-content">
       <p class="hero-eyebrow mono" id="hero-eyebrow">RAMCO INSTITUTE OF TECHNOLOGY — DEPT. OF CSE</p>
@@ -1872,6 +1883,30 @@
 
   gsap.to('#hero-meta', { opacity: 1, duration: 1, delay: 1.0, ease: 'power2.out' });
 
+  // Hero Parallax
+  gsap.to('.hero-bg', {
+    yPercent: 20,
+    ease: "none",
+    scrollTrigger: {
+      trigger: "#home",
+      start: "top top",
+      end: "bottom top",
+      scrub: true
+    }
+  });
+
+  gsap.to('.hero-bg-number', {
+    yPercent: -30,
+    opacity: 0,
+    ease: "none",
+    scrollTrigger: {
+      trigger: "#home",
+      start: "top top",
+      end: "bottom top",
+      scrub: true
+    }
+  });
+
   // Scroll-triggered reveals
   function revealOnScroll(selector, stagger = 0.12) {
     gsap.utils.toArray(selector).forEach((el, i) => {
@@ -1896,6 +1931,48 @@
       onEnter: () => gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
     });
   });
+
+  /* ── INTERACTIVE 3D TILT ──────────────────── */
+  document.querySelectorAll('.member-card, .achievement-item, .writeup-card, .event-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const xPct = x / rect.width - 0.5;
+      const yPct = y / rect.height - 0.5;
+      gsap.to(card, {
+        duration: 0.5,
+        rotationY: xPct * 12,
+        rotationX: -yPct * 12,
+        transformPerspective: 1000,
+        ease: "power2.out"
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      gsap.to(card, {
+        duration: 0.7,
+        rotationY: 0,
+        rotationX: 0,
+        ease: "power3.out"
+      });
+    });
+  });
+
+  /* ── MARQUEE SKEW ON SCROLL ───────────────── */
+  let proxy = { skew: 0 },
+      skewSetter = gsap.quickSetter(".marquee-track", "skewX", "deg"),
+      clamp = gsap.utils.clamp(-20, 20);
+
+  ScrollTrigger.create({
+    onUpdate: (self) => {
+      let skew = clamp(self.getVelocity() / -100);
+      if (Math.abs(skew) > Math.abs(proxy.skew)) {
+        proxy.skew = skew;
+        gsap.to(proxy, {skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew)});
+      }
+    }
+  });
+
 </script>
 
 <!-- Firebase + App (keep existing) -->
@@ -1964,10 +2041,37 @@
   }
 
   function revealNew(sel) {
-    gsap.utils.toArray(sel).forEach(el => {
+    const els = gsap.utils.toArray(sel);
+    els.forEach(el => {
       gsap.to(el, {
         scrollTrigger: { trigger: el, start: 'top 90%' },
         opacity: 1, y: 0, duration: 0.8, ease: 'power3.out'
+      });
+    });
+    
+    // Apply tilt to new elements
+    els.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const xPct = x / rect.width - 0.5;
+        const yPct = y / rect.height - 0.5;
+        gsap.to(card, {
+          duration: 0.5,
+          rotationY: xPct * 12,
+          rotationX: -yPct * 12,
+          transformPerspective: 1000,
+          ease: "power2.out"
+        });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, {
+          duration: 0.7,
+          rotationY: 0,
+          rotationX: 0,
+          ease: "power3.out"
+        });
       });
     });
   }
