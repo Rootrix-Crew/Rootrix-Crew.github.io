@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rootrix Crew — Elite CTF Team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ─── TOKENS ─────────────────────────────── */
+    :root {
+      --bg:        #0a0a0a;
+      --bg-2:      #0f0f0f;
+      --surface:   #141414;
+      --border:    rgba(255,255,255,0.08);
+      --border-hov:rgba(255,255,255,0.18);
+      --text:      #e8e8e8;
+      --muted:     rgba(232,232,232,0.42);
+      --accent:    #e8e8e8;
+      --f-sans:    'Inter', -apple-system, sans-serif;
+      --f-mono:    'JetBrains Mono', monospace;
+      --f-serif:   'Fraunces', Georgia, serif;
+      --ease-out:  cubic-bezier(0.22,1,0.36,1);
+      --ease-in:   cubic-bezier(0.64,0,0.78,0);
+    }
+
+    /* ─── RESET ──────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--f-sans);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* grain overlay */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1000;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── SCROLLBAR ─────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #333; }
+
+    /* ─── SELECTION ─────────────────────────── */
+    ::selection { background: var(--text); color: var(--bg); }
+
+    /* ─── UTILITIES ─────────────────────────── */
+    .mono { font-family: var(--f-mono); }
+    .serif { font-family: var(--f-serif); }
+    .italic { font-style: italic; }
+
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+      flex: 1;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 80px;
+    }
+
+    .section-label span {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    @media (max-width: 768px) {
+      .wrap { padding: 0 24px; }
+    }
+
+    /* ─── SCROLL PROGRESS ───────────────────── */
+    #scroll-bar {
+      position: fixed; top: 0; left: 0; z-index: 500;
+      height: 1px; width: 0%;
+      background: var(--text);
+      transition: width .05s linear;
+    }
+
+    /* ─── HEADER ─────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 400;
+      transition: background .5s var(--ease-out), border-color .5s;
+    }
+
+    header.scrolled {
+      background: rgba(10,10,10,.75);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .4s;
+    }
+
+    .logo:hover .logo-mark { border-color: var(--border-hov); }
+
+    .logo-mark span {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .15em;
+      color: var(--muted);
+    }
+
+    .logo-text-wrap {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-name {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -.01em;
+      color: rgba(232,232,232,.9);
+    }
+
+    .logo-sub-text {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 40px;
+    }
+
+    nav ul a {
+      font-size: 13px;
+      letter-spacing: -.01em;
+      color: rgba(232,232,232,.65);
+      transition: color .3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    nav ul a:hover { color: var(--text); }
+
+    nav ul a .idx {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .nav-cta {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .15em;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      color: rgba(232,232,232,.85);
+      transition: background .4s, border-color .4s, color .4s;
+    }
+
+    .nav-cta:hover {
+      background: var(--text);
+      border-color: var(--text);
+      color: var(--bg);
+    }
+
+    /* hamburger */
+    .ham {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .ham span {
+      display: block;
+      width: 22px; height: 1px;
+      background: var(--text);
+      transition: transform .3s, opacity .3s;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0; z-index: 380;
+      background: rgba(10,10,10,.96);
+      backdrop-filter: blur(24px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 300;
+      letter-spacing: -.02em;
+      color: var(--muted);
+      transition: color .3s;
+    }
+
+    .mobile-menu a:hover { color: var(--text); }
+
+    .mobile-close {
+      position: absolute; top: 24px; right: 32px;
+      font-size: 24px; cursor: pointer;
+      background: none; border: none;
+      color: var(--muted);
+    }
+
+    /* ─── HERO ───────────────────────────────── */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--f-mono);
+      font-size: clamp(180px, 28vw, 380px);
+      font-weight: 400;
+      letter-spacing: -.05em;
+      color: rgba(255,255,255,.025);
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .hero-content { position: relative; z-index: 2; }
+
+    .hero-eyebrow {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      margin-bottom: 32px;
+      opacity: 0;
+    }
+
+    .hero-title {
+      font-size: clamp(52px, 10vw, 148px);
+      font-weight: 300;
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+
+    .hero-title .line { display: block; overflow: hidden; }
+    .hero-title .line span { display: block; transform: translateY(110%); }
+
+    .hero-title .accent {
+      font-family: var(--f-serif);
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(232,232,232,.6);
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+      opacity: 0;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 400px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .btn-primary {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .18em;
+      padding: 14px 28px;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      transition: opacity .3s;
+    }
+
+    .btn-primary:hover { opacity: .85; }
+
+    .btn-ghost {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .18em;
+      color: var(--muted);
+      transition: color .3s;
+      cursor: pointer;
+      background: none; border: none;
+    }
+
+    .btn-ghost:hover { color: var(--text); }
+
+    .scroll-cue {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+    }
+
+    .scroll-cue-line {
+      width: 40px; height: 1px;
+      background: var(--muted);
+      position: relative; overflow: hidden;
+    }
+
+    .scroll-cue-line::after {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: var(--text);
+      animation: slide-right 2s var(--ease-out) infinite;
+    }
+
+    @keyframes slide-right {
+      0%   { left: -100%; }
+      50%  { left: 0; }
+      100% { left: 100%; }
+    }
+
+    /* ─── MARQUEE ────────────────────────────── */
+    .marquee-section {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+      overflow: hidden;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      white-space: nowrap;
+    }
+
+    .marquee-inner {
+      display: flex;
+      gap: 0;
+      animation: marquee 30s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 32px;
+      padding: 0 40px;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    .marquee-item .dot {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ─── STATS ──────────────────────────────── */
+    #stats {
+      padding: 120px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .stat-cell {
+      background: var(--bg);
+      padding: 48px 40px;
+      transition: background .4s;
+    }
+
+    .stat-cell:hover { background: var(--bg-2); }
+
+    .stat-value {
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 200;
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .25em;
+      color: var(--muted);
+    }
+
+    /* ─── ABOUT / MEMBERS ────────────────────── */
+    #about {
+      padding: 140px 0;
+    }
+
+    .about-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      margin-bottom: 100px;
+      align-items: end;
+    }
+
+    .about-heading {
+      font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 300;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+    }
+
+    .about-body {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 420px;
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .member-card {
+      background: var(--bg);
+      padding: 40px;
+      transition: background .5s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .member-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-hov), transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .6s var(--ease-out);
+    }
+
+    .member-card:hover { background: var(--bg-2); }
+    .member-card:hover::after { transform: scaleX(1); }
+
+    .member-avatar-wrap {
+      width: 64px; height: 64px;
+      border: 1px solid var(--border);
+      margin-bottom: 28px;
+      overflow: hidden;
+      transition: border-color .4s;
+    }
+
+    .member-card:hover .member-avatar-wrap { border-color: var(--border-hov); }
+
+    .member-avatar-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%);
+      transition: filter .4s;
+    }
+
+    .member-card:hover .member-avatar-wrap img { filter: grayscale(30%); }
+
+    .member-avatar-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface);
+      font-family: var(--f-mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .member-handle {
+      font-family: var(--f-mono);
+      font-size: 12px;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .member-role {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 28px;
+    }
+
+    .member-skills {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .skill-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .skill-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .15em;
+      color: var(--muted);
+    }
+
+    .skill-track {
+      height: 1px;
+      background: var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-fill {
+      position: absolute;
+      top: 0; left: 0; height: 100%;
+      background: var(--text);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.2s var(--ease-out);
+    }
+
+    .member-card.in-view .skill-fill { transform: scaleX(1); }
+
+    /* ─── ACHIEVEMENTS ───────────────────────── */
+    #achievements {
+      padding: 140px 0;
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .achievements-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      margin-bottom: 80px;
+      align-items: end;
+    }
+
+    .achievements-heading {
+      font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 300;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+    }
+
+    #achievementsGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .achievement-item {
+      background: var(--bg-2);
+      padding: 40px;
+      transition: background .4s;
+    }
+
+    .achievement-item:hover { background: var(--surface); }
+
+    .achievement-icon-wrap {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .achievement-title {
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: -.02em;
+      margin-bottom: 10px;
+    }
+
+    .achievement-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 20px;
+    }
+
+    .achievement-meta {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    .achievements-empty {
+      grid-column: 1/-1;
+      padding: 80px 40px;
+      background: var(--bg-2);
+      text-align: center;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    /* ─── WRITEUPS ───────────────────────────── */
+    #blog {
+      padding: 140px 0;
+    }
+
+    #writeupsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .writeup-card {
+      background: var(--bg);
+      padding: 48px;
+      transition: background .4s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .writeup-card:hover { background: var(--bg-2); }
+
+    .writeup-type-tag {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    .writeup-title {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -.02em;
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+
+    .writeup-desc {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 32px;
+    }
+
+    .writeup-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .writeup-topic {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    .writeup-arrow {
+      font-family: var(--f-mono);
+      font-size: 11px;
+      color: var(--muted);
+      transition: transform .3s, color .3s;
+    }
+
+    .writeup-card:hover .writeup-arrow {
+      transform: translate(4px, -4px);
+      color: var(--text);
+    }
+
+    .writeups-empty {
+      grid-column: 1/-1;
+      padding: 80px 48px;
+      background: var(--bg);
+      text-align: center;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    /* ─── EVENTS / JOIN ──────────────────────── */
+    #join {
+      padding: 140px 0;
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+    }
+
+    #eventsGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-bottom: 100px;
+    }
+
+    .event-card {
+      background: var(--bg-2);
+      padding: 40px;
+      transition: background .4s;
+    }
+
+    .event-card:hover { background: var(--surface); }
+
+    .event-date-tag {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .event-title {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: -.02em;
+      margin-bottom: 12px;
+    }
+
+    .event-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .events-empty {
+      grid-column: 1/-1;
+      padding: 80px 40px;
+      background: var(--bg-2);
+      text-align: center;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    /* Join CTA */
+    .join-cta-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .join-heading {
+      font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 300;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+    }
+
+    .join-body {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 32px;
+    }
+
+    /* ─── FOOTER ─────────────────────────────── */
+    footer {
+      padding: 64px 0 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 64px;
+    }
+
+    .footer-brand p {
+      margin-top: 20px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 280px;
+    }
+
+    .footer-col-title {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: rgba(232,232,232,.55);
+      transition: color .3s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-bottom {
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-bottom span {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+    }
+
+    /* ─── NOTIFICATION ───────────────────────── */
+    #notification {
+      position: fixed; top: 24px; right: 24px;
+      z-index: 600;
+      max-width: 320px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--text);
+      transform: translateX(360px);
+      transition: transform .4s var(--ease-out);
+      pointer-events: none;
+    }
+
+    #notification.show {
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    #notification .notif-label {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    /* ─── ADMIN ──────────────────────────────── */
+    .admin-nav {
+      position: fixed; top: 80px; right: 24px;
+      z-index: 500;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 200px;
+    }
+
+    .admin-nav.visible { display: flex; }
+
+    .admin-title {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .admin-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 12px;
+      font-family: var(--f-sans);
+      cursor: pointer;
+      transition: background .3s, border-color .3s;
+      text-align: left;
+    }
+
+    .admin-btn:hover {
+      background: var(--bg-2);
+      border-color: var(--border-hov);
+    }
+
+    /* ─── MODALS ──────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 800;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-header {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: -.02em;
+    }
+
+    .modal-close {
+      background: none; border: none;
+      color: var(--muted); font-size: 20px;
+      cursor: pointer; transition: color .3s;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-section {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-section-title {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--f-sans);
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .3s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--border-hov);
+    }
+
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-submit {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .15em;
+      padding: 12px 24px;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      transition: opacity .3s;
+    }
+
+    .btn-submit:hover { opacity: .85; }
+
+    .modal-list-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-list-item:last-child { border-bottom: none; }
+
+    .list-item-name {
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .list-item-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .btn-delete {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .15em;
+      padding: 6px 12px;
+      background: none;
+      border: 1px solid rgba(255,80,80,.3);
+      color: rgba(255,100,100,.7);
+      cursor: pointer;
+      transition: all .3s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-delete:hover {
+      background: rgba(255,80,80,.1);
+      border-color: rgba(255,80,80,.6);
+      color: rgba(255,120,120,1);
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-intro { grid-template-columns: 1fr; gap: 40px; }
+      .achievements-intro { grid-template-columns: 1fr; gap: 40px; }
+      #achievementsGrid { grid-template-columns: repeat(2, 1fr); }
+      #eventsGrid { grid-template-columns: repeat(2, 1fr); }
+      .join-cta-block { grid-template-columns: 1fr; gap: 40px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-inner { padding: 18px 24px; }
+      nav ul, .nav-cta { display: none; }
+      .ham { display: flex; }
+      .hero-title { font-size: clamp(40px, 12vw, 72px); }
+      .members-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      #achievementsGrid { grid-template-columns: 1fr; }
+      #writeupsGrid { grid-template-columns: 1fr; }
+      #eventsGrid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .join-cta-block { grid-template-columns: 1fr; }
+    }
+
+    /* ─── GSAP initial states ────────────────── */
+    .gsap-fade { opacity: 0; }
+    .gsap-up { opacity: 0; transform: translateY(32px); }
+    .gsap-left { opacity: 0; transform: translateX(-24px); }
+  </style>
+</head>
+<body>
+
+<!-- ─── SCROLL PROGRESS ─────────────────────── -->
+<div id="scroll-bar"></div>
+
+<!-- ─── NOTIFICATION ───────────────────────── -->
+<div id="notification">
+  <div class="notif-label" id="notif-label">NOTIFICATION</div>
+  <div id="notif-msg"></div>
+</div>
+
+<!-- ─── ADMIN NAV ───────────────────────────── -->
+<nav class="admin-nav" id="adminNav">
+  <div class="admin-title">ADMIN TOOLS</div>
+  <button class="admin-btn" onclick="app.openHallOfFameEditor()">Manage Achievements</button>
+  <button class="admin-btn" onclick="app.openWriteupEditor()">Manage Writeups</button>
+  <button class="admin-btn" onclick="app.openEventsEditor()">Manage Events</button>
+  <button class="admin-btn" onclick="app.handleSignOut()">Sign Out</button>
+</nav>
+
+<!-- ─── ACHIEVEMENTS MODAL ─────────────────── -->
+<div class="modal-overlay" id="hofEditorModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Achievements Manager</span>
+      <button class="modal-close hof-close">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">ADD ACHIEVEMENT</div>
+      <form id="addAchievementForm">
+        <div class="field-row">
+          <div class="field">
+            <label>TITLE</label>
+            <input type="text" id="achievementTitle" required />
+          </div>
+          <div class="field">
+            <label>PLACE / POSITION</label>
+            <input type="text" id="achievementPlace" placeholder="e.g. 1st Place" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>ICON</label>
+            <select id="achievementIcon" required>
+              <option value="🏆">🏆 Gold Trophy</option>
+              <option value="🥈">🥈 Silver</option>
+              <option value="🥉">🥉 Bronze</option>
+              <option value="🛡️">🛡️ Security</option>
+              <option value="📚">📚 Knowledge</option>
+              <option value="👥">👥 Community</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>DATE</label>
+            <input type="text" id="achievementDate" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>DESCRIPTION</label>
+          <textarea id="achievementDescription" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">ADD ACHIEVEMENT</button>
+      </form>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">EXISTING ACHIEVEMENTS</div>
+      <div id="achievementsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── EVENTS MODAL ─────────────────────────── -->
+<div class="modal-overlay" id="eventsEditorModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Events Manager</span>
+      <button class="modal-close events-close">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">ADD EVENT</div>
+      <form id="addEventForm">
+        <div class="field-row">
+          <div class="field">
+            <label>TITLE</label>
+            <input type="text" id="eventTitle" required />
+          </div>
+          <div class="field">
+            <label>DATE</label>
+            <input type="text" id="eventDate" placeholder="e.g. Oct 15, 2025" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>DESCRIPTION</label>
+          <textarea id="eventDescription" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">ADD EVENT</button>
+      </form>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">EXISTING EVENTS</div>
+      <div id="eventsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── WRITEUPS MODAL ───────────────────────── -->
+<div class="modal-overlay" id="writeupEditorModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Writeups Manager</span>
+      <button class="modal-close writeup-close">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">ADD WRITEUP</div>
+      <form id="addWriteupForm">
+        <div class="field-row">
+          <div class="field">
+            <label>TITLE</label>
+            <input type="text" id="writeupTitle" required />
+          </div>
+          <div class="field">
+            <label>TYPE</label>
+            <select id="writeupType" required>
+              <option value="CTF">CTF</option>
+              <option value="PoC">PoC</option>
+              <option value="Knowledge">Knowledge</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>TOPIC</label>
+            <select id="writeupTopic" required>
+              <option value="Web Exploit">Web Exploit</option>
+              <option value="Reverse">Reverse</option>
+              <option value="OSINT">OSINT</option>
+              <option value="Mobile">Mobile</option>
+              <option value="Crypto">Cryptography</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>WRITEUP URL</label>
+            <input type="url" id="writeupUrl" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>DESCRIPTION</label>
+          <textarea id="writeupDescription" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">ADD WRITEUP</button>
+      </form>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">EXISTING WRITEUPS</div>
+      <div id="writeupsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── HEADER ──────────────────────────────── -->
+<header id="header">
+  <div class="nav-inner">
+    <a href="#home" class="logo">
+      <div class="logo-mark"><span>R7X</span></div>
+      <div class="logo-text-wrap">
+        <span class="logo-name">Rootrix Crew</span>
+        <span class="logo-sub-text">ELITE CTF TEAM</span>
+      </div>
+    </a>
+
+    <ul>
+      <li><a href="#home"><span class="idx">01</span> Home</a></li>
+      <li><a href="#about"><span class="idx">02</span> Members</a></li>
+      <li><a href="#achievements"><span class="idx">03</span> Achievements</a></li>
+      <li><a href="#blog"><span class="idx">04</span> Writeups</a></li>
+      <li><a href="#join"><span class="idx">05</span> Events</a></li>
+    </ul>
+
+    <a href="#join" class="nav-cta" id="authLink">JOIN US</a>
+
+    <button class="ham" id="ham" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ─── MOBILE MENU ─────────────────────────── -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#home" class="mob-link">Home</a>
+  <a href="#about" class="mob-link">Members</a>
+  <a href="#achievements" class="mob-link">Achievements</a>
+  <a href="#blog" class="mob-link">Writeups</a>
+  <a href="#join" class="mob-link">Events</a>
+</div>
+
+<!-- ─── MAIN ────────────────────────────────── -->
+<main>
+
+  <!-- HERO -->
+  <section id="home">
+    <div class="hero-bg-number">R7X</div>
+    <div class="wrap hero-content">
+      <p class="hero-eyebrow mono" id="hero-eyebrow">RAMCO INSTITUTE OF TECHNOLOGY — DEPT. OF CSE</p>
+      <h1 class="hero-title" id="hero-title">
+        <span class="line"><span>Rootrix</span></span>
+        <span class="line"><span><em class="accent serif italic">Crew.</em></span></span>
+      </h1>
+      <div class="hero-meta" id="hero-meta">
+        <p class="hero-desc">An elite CTF team from Ramco Institute of Technology, breaking systems, solving challenges, and leaving flags behind.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">MEET THE CREW</button>
+          <div class="scroll-cue">
+            <div class="scroll-cue-line"></div>
+            <span>SCROLL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <div class="marquee-inner" id="marqueeInner">
+        <!-- items duplicated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <section id="stats">
+    <div class="wrap">
+      <div class="stats-grid">
+        <div class="stat-cell gsap-up">
+          <div class="stat-value">6</div>
+          <div class="stat-label">TEAM MEMBERS</div>
+        </div>
+        <div class="stat-cell gsap-up">
+          <div class="stat-value">CTF</div>
+          <div class="stat-label">COMPETITIONS ENTERED</div>
+        </div>
+        <div class="stat-cell gsap-up">
+          <div class="stat-value">∞</div>
+          <div class="stat-label">FLAGS CAPTURED</div>
+        </div>
+        <div class="stat-cell gsap-up">
+          <div class="stat-value">2024</div>
+          <div class="stat-label">FOUNDED</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / MEMBERS -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-label gsap-fade">
+        <span>02 — CREW MEMBERS</span>
+        <div class="hairline"></div>
+      </div>
+
+      <div class="about-intro">
+        <h2 class="about-heading gsap-up">
+          Six minds.<br /><em class="serif italic" style="color:var(--muted)">One mission.</em>
+        </h2>
+        <p class="about-body gsap-up">
+          Each member brings a razor-sharp specialisation — web exploitation, cryptography, forensics, reverse engineering, mobile security, and binary exploitation. Together, we compete, learn, and push each other past every limit.
+        </p>
+      </div>
+
+      <div class="members-grid" id="membersGrid">
+
+        <!-- R7X_Dyn4m0 -->
+        <div class="member-card gsap-up" data-delay="0">
+          <div class="member-avatar-wrap">
+            <img src="assets/images/DYNAMO.png" alt="R7X_Dyn4m0"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="member-avatar-placeholder" style="display:none">DYN</div>
+          </div>
+          <div class="member-handle">R7X_Dyn4m0</div>
+          <div class="member-role">Captain &amp; Web Expert</div>
+          <div class="member-skills">
+            <div class="skill-row">
+              <div class="skill-label"><span>Web Security</span><span>95%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.95"></div></div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label"><span>Exploitation</span><span>90%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.90"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R7X_XAIOWU -->
+        <div class="member-card gsap-up" data-delay="0.08">
+          <div class="member-avatar-wrap">
+            <img src="assets/images/XAIWOU.png" alt="R7X_XAIOWU"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="member-avatar-placeholder" style="display:none">XAI</div>
+          </div>
+          <div class="member-handle">R7X_XAIOWU</div>
+          <div class="member-role">Cryptography Specialist</div>
+          <div class="member-skills">
+            <div class="skill-row">
+              <div class="skill-label"><span>Cryptography</span><span>98%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.98"></div></div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label"><span>Mathematics</span><span>85%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.85"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R7X_Adr5y4 -->
+        <div class="member-card gsap-up" data-delay="0.16">
+          <div class="member-avatar-wrap">
+            <img src="assets/images/ADRSHYA.png" alt="R7X_Adr5y4"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="member-avatar-placeholder" style="display:none">ADR</div>
+          </div>
+          <div class="member-handle">R7X_Adr5y4</div>
+          <div class="member-role">Forensics &amp; OSINT</div>
+          <div class="member-skills">
+            <div class="skill-row">
+              <div class="skill-label"><span>Forensics</span><span>92%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.92"></div></div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label"><span>OSINT</span><span>88%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.88"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R7X_S4kuR4 -->
+        <div class="member-card gsap-up" data-delay="0.24">
+          <div class="member-avatar-wrap">
+            <img src="assets/images/SAKURA.png" alt="R7X_S4kuR4"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="member-avatar-placeholder" style="display:none">SAK</div>
+          </div>
+          <div class="member-handle">R7X_S4kuR4</div>
+          <div class="member-role">Web Security &amp; Reverse</div>
+          <div class="member-skills">
+            <div class="skill-row">
+              <div class="skill-label"><span>Reverse Eng.</span><span>94%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.94"></div></div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label"><span>Web Security</span><span>91%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.91"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R7X_D0odl3s -->
+        <div class="member-card gsap-up" data-delay="0.32">
+          <div class="member-avatar-wrap">
+            <img src="assets/images/DOODLES.png" alt="R7X_D0odl3s"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="member-avatar-placeholder" style="display:none">DOO</div>
+          </div>
+          <div class="member-handle">R7X_D0odl3s</div>
+          <div class="member-role">Mobile &amp; OT Security</div>
+          <div class="member-skills">
+            <div class="skill-row">
+              <div class="skill-label"><span>Mobile Security</span><span>93%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.93"></div></div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label"><span>OT/IoT</span><span>89%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.89"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R7X_5H4w4rm4 -->
+        <div class="member-card gsap-up" data-delay="0.40">
+          <div class="member-avatar-wrap">
+            <img src="assets/images/shawarma.jpeg" alt="R7X_5H4w4rm4"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="member-avatar-placeholder" style="display:none">SHA</div>
+          </div>
+          <div class="member-handle">R7X_5H4w4rm4</div>
+          <div class="member-role">Binary Exploitation</div>
+          <div class="member-skills">
+            <div class="skill-row">
+              <div class="skill-label"><span>Binary Exploit</span><span>93%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.93"></div></div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label"><span>PWN</span><span>89%</span></div>
+              <div class="skill-track"><div class="skill-fill" style="--w:0.89"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /members-grid -->
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements">
+    <div class="wrap">
+      <div class="section-label gsap-fade">
+        <span>03 — HALL OF FAME</span>
+        <div class="hairline"></div>
+      </div>
+      <div class="achievements-intro">
+        <h2 class="achievements-heading gsap-up">
+          Hard-earned.<br /><em class="serif italic" style="color:var(--muted)">Well deserved.</em>
+        </h2>
+        <p class="about-body gsap-up" style="align-self:end">
+          Every flag captured, every ranking earned. These are the milestones that mark our journey through the competitive security landscape.
+        </p>
+      </div>
+      <div id="achievementsGrid">
+        <div class="achievements-empty">Loading achievements…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WRITEUPS -->
+  <section id="blog">
+    <div class="wrap">
+      <div class="section-label gsap-fade">
+        <span>04 — WRITEUPS</span>
+        <div class="hairline"></div>
+      </div>
+      <div class="about-intro" style="margin-bottom:60px">
+        <h2 class="about-heading gsap-up">
+          Knowledge<br /><em class="serif italic" style="color:var(--muted)">shared openly.</em>
+        </h2>
+        <p class="about-body gsap-up" style="align-self:end">
+          Every challenge teaches something. We document what we learn so the community grows with us.
+        </p>
+      </div>
+      <div id="writeupsGrid">
+        <div class="writeups-empty">Loading writeups…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS & JOIN -->
+  <section id="join">
+    <div class="wrap">
+      <div class="section-label gsap-fade">
+        <span>05 — EVENTS &amp; JOIN</span>
+        <div class="hairline"></div>
+      </div>
+      <div class="achievements-intro">
+        <h2 class="achievements-heading gsap-up">
+          Upcoming<br /><em class="serif italic" style="color:var(--muted)">events.</em>
+        </h2>
+        <p class="about-body gsap-up" style="align-self:end">
+          CTF competitions, workshops, and collaborative sessions — where theory meets practice.
+        </p>
+      </div>
+      <div id="eventsGrid">
+        <div class="events-empty">Loading events…</div>
+      </div>
+
+      <div class="join-cta-block" style="margin-top:80px; padding-top:80px; border-top:1px solid var(--border)">
+        <div>
+          <h2 class="join-heading gsap-up">
+            Ready to<br /><em class="serif italic" style="color:var(--muted)">hack in?</em>
+          </h2>
+        </div>
+        <div class="gsap-up">
+          <p class="join-body">
+            We're always looking for curious, sharp minds who want to push their skills. If you eat CTF challenges for breakfast, you belong here.
+          </p>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <button class="btn-primary"
+              onclick="window.open('https://docs.google.com/forms/d/1zYn8hc-APpw7KFLiTtzLIQ5nonLQUREAtOFtIuRvmNs/viewform','_blank')">
+              APPLY NOW
+            </button>
+            <a href="#about" class="btn-ghost" style="display:inline-flex;align-items:center">VIEW MEMBERS →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── FOOTER ───────────────────────────────── -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-mark"><span>R7X</span></div>
+          <div class="logo-text-wrap">
+            <span class="logo-name">Rootrix Crew</span>
+            <span class="logo-sub-text">ELITE CTF TEAM</span>
+          </div>
+        </div>
+        <p>Independent CTF team from Ramco Institute of Technology, Department of Computer Science and Engineering.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">NAVIGATE</div>
+        <ul class="footer-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">Members</a></li>
+          <li><a href="#achievements">Achievements</a></li>
+          <li><a href="#blog">Writeups</a></li>
+          <li><a href="#join">Events</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">CONNECT</div>
+        <ul class="footer-links">
+          <li><a href="html/login.html" id="footerAuthLink">Sign In</a></li>
+          <li><a href="html/rootrix.html">Rootrix Protocol</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 — ROOTRIX CREW. ALL RIGHTS RESERVED.</span>
+      <span>RAMCO INSTITUTE OF TECHNOLOGY</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── SCRIPTS ──────────────────────────────── -->
+<script>
+  /* ── MARQUEE DATA ──────────────────────────── */
+  const tags = ['Web Exploit','Cryptography','Forensics','OSINT','Reverse Eng.','Mobile Security','Binary PWN','OT Security','CTF','Network'];
+  const mi = document.getElementById('marqueeInner');
+  const html = tags.map(t => `<span class="marquee-item"><span class="dot"></span>${t}</span>`).join('');
+  mi.innerHTML = html + html; // duplicate for seamless loop
+
+  /* ── SCROLL PROGRESS ──────────────────────── */
+  const bar = document.getElementById('scroll-bar');
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+    bar.style.width = pct + '%';
+  });
+
+  /* ── HEADER SCROLL ────────────────────────── */
+  const hdr = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    hdr.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  /* ── MOBILE MENU ──────────────────────────── */
+  const ham = document.getElementById('ham');
+  const mm  = document.getElementById('mobileMenu');
+  const mClose = document.getElementById('mobileClose');
+
+  ham.addEventListener('click', () => mm.classList.toggle('open'));
+  mClose.addEventListener('click', () => mm.classList.remove('open'));
+  document.querySelectorAll('.mob-link').forEach(l =>
+    l.addEventListener('click', () => mm.classList.remove('open'))
+  );
+
+  /* ── MODAL HELPERS ────────────────────────── */
+  document.querySelectorAll('.hof-close').forEach(b =>
+    b.addEventListener('click', () => document.getElementById('hofEditorModal').classList.remove('open'))
+  );
+  document.querySelectorAll('.events-close').forEach(b =>
+    b.addEventListener('click', () => document.getElementById('eventsEditorModal').classList.remove('open'))
+  );
+  document.querySelectorAll('.writeup-close').forEach(b =>
+    b.addEventListener('click', () => document.getElementById('writeupEditorModal').classList.remove('open'))
+  );
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  /* expose open fns for app.js compatibility */
+  window._openModal = id => document.getElementById(id).classList.add('open');
+
+  /* ── NOTIFICATION ─────────────────────────── */
+  function showNotif(msg, type = 'info') {
+    const el = document.getElementById('notification');
+    document.getElementById('notif-label').textContent = type.toUpperCase();
+    document.getElementById('notif-msg').textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  window.showNotification = showNotif;
+
+  /* ── SKILL BARS on scroll ─────────────────── */
+  const cards = document.querySelectorAll('.member-card');
+  const cardObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        e.target.querySelectorAll('.skill-fill').forEach(f => {
+          f.style.transform = `scaleX(${f.style.getPropertyValue('--w') || 1})`;
+        });
+      }
+    });
+  }, { threshold: 0.25 });
+  cards.forEach(c => cardObs.observe(c));
+
+  /* ── GSAP ANIMATIONS ──────────────────────── */
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero entrance
+  gsap.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 1, delay: 0.3, ease: 'power3.out' });
+
+  const lines = document.querySelectorAll('.hero-title .line span');
+  gsap.to(lines, {
+    y: 0, duration: 1.1, stagger: 0.12, delay: 0.5, ease: 'power3.out'
+  });
+
+  gsap.to('#hero-meta', { opacity: 1, duration: 1, delay: 1.0, ease: 'power2.out' });
+
+  // Scroll-triggered reveals
+  function revealOnScroll(selector, stagger = 0.12) {
+    gsap.utils.toArray(selector).forEach((el, i) => {
+      const delay = parseFloat(el.dataset.delay || 0);
+      gsap.to(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+        opacity: 1, y: 0, x: 0, duration: 0.9,
+        delay,
+        ease: 'power3.out'
+      });
+    });
+  }
+
+  revealOnScroll('.gsap-up');
+  revealOnScroll('.gsap-fade');
+  revealOnScroll('.gsap-left');
+
+  // Stats counter animation
+  document.querySelectorAll('.stat-value').forEach(el => {
+    ScrollTrigger.create({
+      trigger: el, start: 'top 85%',
+      onEnter: () => gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
+    });
+  });
+</script>
+
+<!-- Firebase + App (keep existing) -->
+<script type="module">
+  import { authManager } from './js/auth.js';
+  import {
+    db, auth, collection, getDocs, addDoc, deleteDoc, doc,
+    getDoc, setDoc, updateDoc, increment, query, orderBy
+  } from './js/firebase.js';
+
+  /* ── Render helpers ───────────────────────── */
+  function renderAchievements(list) {
+    const grid = document.getElementById('achievementsGrid');
+    if (!list.length) {
+      grid.innerHTML = '<div class="achievements-empty">No achievements yet — stay tuned.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(a => `
+      <div class="achievement-item gsap-up">
+        <div class="achievement-icon-wrap">${a.icon || '🏆'}</div>
+        <div class="achievement-title">${a.title}</div>
+        ${a.place ? `<div class="achievement-meta" style="margin-bottom:8px">${a.place}</div>` : ''}
+        <p class="achievement-desc">${a.description}</p>
+        <div class="achievement-meta">${a.date}</div>
+      </div>
+    `).join('');
+    revealNew('.achievement-item.gsap-up');
+  }
+
+  function renderWriteups(list) {
+    const grid = document.getElementById('writeupsGrid');
+    if (!list.length) {
+      grid.innerHTML = '<div class="writeups-empty">No writeups yet — first one is brewing.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(w => `
+      <div class="writeup-card gsap-up" onclick="window.open('${w.url}','_blank')">
+        <span class="writeup-type-tag">${w.type}</span>
+        <h3 class="writeup-title">${w.title}</h3>
+        <p class="writeup-desc">${w.description}</p>
+        <div class="writeup-footer">
+          <span class="writeup-topic">${w.topic}</span>
+          <span class="writeup-arrow">↗</span>
+        </div>
+      </div>
+    `).join('');
+    revealNew('.writeup-card.gsap-up');
+  }
+
+  function renderEvents(list) {
+    const grid = document.getElementById('eventsGrid');
+    if (!list.length) {
+      grid.innerHTML = '<div class="events-empty">No upcoming events — check back soon.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(e => `
+      <div class="event-card gsap-up">
+        <div class="event-date-tag">${e.date}</div>
+        <h3 class="event-title">${e.title}</h3>
+        <p class="event-desc">${e.description}</p>
+      </div>
+    `).join('');
+    revealNew('.event-card.gsap-up');
+  }
+
+  function revealNew(sel) {
+    gsap.utils.toArray(sel).forEach(el => {
+      gsap.to(el, {
+        scrollTrigger: { trigger: el, start: 'top 90%' },
+        opacity: 1, y: 0, duration: 0.8, ease: 'power3.out'
+      });
+    });
+  }
+
+  /* ── Modal list renderers (for admin) ─────── */
+  function renderAchievementList(list) {
+    const el = document.getElementById('achievementsList');
+    if (!list.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted)">No achievements yet.</p>'; return; }
+    el.innerHTML = list.map(a => `
+      <div class="modal-list-item">
+        <div>
+          <div class="list-item-name">${a.icon || '🏆'} ${a.title}</div>
+          <div class="list-item-sub">${a.date} ${a.place ? '· ' + a.place : ''}</div>
+        </div>
+        <button class="btn-delete" onclick="deleteItem('achievements','${a.id}')">DELETE</button>
+      </div>
+    `).join('');
+  }
+
+  function renderWriteupList(list) {
+    const el = document.getElementById('writeupsList');
+    if (!list.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted)">No writeups yet.</p>'; return; }
+    el.innerHTML = list.map(w => `
+      <div class="modal-list-item">
+        <div>
+          <div class="list-item-name">${w.title}</div>
+          <div class="list-item-sub">${w.type} · ${w.topic}</div>
+        </div>
+        <button class="btn-delete" onclick="deleteItem('writeups','${w.id}')">DELETE</button>
+      </div>
+    `).join('');
+  }
+
+  function renderEventList(list) {
+    const el = document.getElementById('eventsList');
+    if (!list.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted)">No events yet.</p>'; return; }
+    el.innerHTML = list.map(e => `
+      <div class="modal-list-item">
+        <div>
+          <div class="list-item-name">${e.title}</div>
+          <div class="list-item-sub">${e.date}</div>
+        </div>
+        <button class="btn-delete" onclick="deleteItem('events','${e.id}')">DELETE</button>
+      </div>
+    `).join('');
+  }
+
+  window.deleteItem = async (coll, id) => {
+    if (!confirm('Delete this item?')) return;
+    await deleteDoc(doc(db, coll, id));
+    window.showNotification('Deleted successfully.', 'success');
+    loadAll();
+  };
+
+  /* ── Data loading ─────────────────────────── */
+  async function loadAll() {
+    try {
+      const [aDocs, wDocs, eDocs] = await Promise.all([
+        getDocs(query(collection(db,'achievements'), orderBy('date','desc'))),
+        getDocs(query(collection(db,'writeups'), orderBy('createdAt','desc'))),
+        getDocs(query(collection(db,'events'), orderBy('date','asc')))
+      ]);
+      const achievements = aDocs.docs.map(d => ({id:d.id,...d.data()}));
+      const writeups     = wDocs.docs.map(d => ({id:d.id,...d.data()}));
+      const events       = eDocs.docs.map(d => ({id:d.id,...d.data()}));
+      renderAchievements(achievements);
+      renderWriteups(writeups);
+      renderEvents(events);
+      renderAchievementList(achievements);
+      renderWriteupList(writeups);
+      renderEventList(events);
+    } catch(e) {
+      console.error('Load error', e);
+    }
+  }
+
+  loadAll();
+
+  /* ── App object (compat with admin buttons) ─ */
+  window.app = {
+    openHallOfFameEditor: () => window._openModal('hofEditorModal'),
+    openWriteupEditor:    () => window._openModal('writeupEditorModal'),
+    openEventsEditor:     () => window._openModal('eventsEditorModal'),
+    handleSignOut: async () => { await auth.signOut(); window.showNotification('Signed out.','info'); }
+  };
+
+  /* ── Auth state ───────────────────────────── */
+  authManager.onAuthStateChange(state => {
+    const adminNav = document.getElementById('adminNav');
+    const authLink = document.getElementById('authLink');
+    const footerLink = document.getElementById('footerAuthLink');
+    if (state.isAuthenticated) {
+      if (authLink) { authLink.textContent = 'SIGN OUT'; authLink.href='#'; authLink.onclick=e=>{e.preventDefault();app.handleSignOut();}; }
+      if (footerLink) { footerLink.textContent = 'Sign Out'; footerLink.href='#'; footerLink.onclick=e=>{e.preventDefault();app.handleSignOut();}; }
+      if (adminNav && state.isAdmin) adminNav.classList.add('visible');
+    } else {
+      if (authLink) { authLink.textContent = 'JOIN US'; authLink.href='#join'; authLink.onclick=null; }
+      if (footerLink) { footerLink.textContent = 'Sign In'; footerLink.href='html/login.html'; footerLink.onclick=null; }
+      if (adminNav) adminNav.classList.remove('visible');
+    }
+  });
+
+  /* ── Form handlers ────────────────────────── */
+  document.getElementById('addAchievementForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    await addDoc(collection(db,'achievements'), {
+      title:       document.getElementById('achievementTitle').value,
+      place:       document.getElementById('achievementPlace').value,
+      icon:        document.getElementById('achievementIcon').value,
+      date:        document.getElementById('achievementDate').value,
+      description: document.getElementById('achievementDescription').value
+    });
+    e.target.reset();
+    window.showNotification('Achievement added!','success');
+    loadAll();
+  });
+
+  document.getElementById('addEventForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    await addDoc(collection(db,'events'), {
+      title:       document.getElementById('eventTitle').value,
+      date:        document.getElementById('eventDate').value,
+      description: document.getElementById('eventDescription').value
+    });
+    e.target.reset();
+    window.showNotification('Event added!','success');
+    loadAll();
+  });
+
+  document.getElementById('addWriteupForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    await addDoc(collection(db,'writeups'), {
+      title:       document.getElementById('writeupTitle').value,
+      type:        document.getElementById('writeupType').value,
+      topic:       document.getElementById('writeupTopic').value,
+      url:         document.getElementById('writeupUrl').value,
+      description: document.getElementById('writeupDescription').value,
+      createdAt:   new Date().toISOString()
+    });
+    e.target.reset();
+    window.showNotification('Writeup added!','success');
+    loadAll();
+  });
+</script>
+
+</body>
+</html>

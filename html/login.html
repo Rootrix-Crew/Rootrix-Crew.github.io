@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rootrix Crew — Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    /* ─── TOKENS — exact match to index.html ─── */
+    :root {
+      --bg:         #0a0a0a;
+      --bg-2:       #0f0f0f;
+      --surface:    #141414;
+      --border:     rgba(255,255,255,0.08);
+      --border-hov: rgba(255,255,255,0.18);
+      --text:       #e8e8e8;
+      --muted:      rgba(232,232,232,0.42);
+      --f-sans:     'Inter', -apple-system, sans-serif;
+      --f-mono:     'JetBrains Mono', monospace;
+      --f-serif:    'Fraunces', Georgia, serif;
+      --ease-out:   cubic-bezier(0.22,1,0.36,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--f-sans);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* Grain overlay — same as index */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1000;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    ::selection { background: var(--text); color: var(--bg); }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── LEFT PANEL — editorial side ─────────── */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Big background number like index hero */
+    .left-bg-glyph {
+      position: absolute;
+      bottom: -40px;
+      left: -20px;
+      font-family: var(--f-mono);
+      font-size: clamp(160px, 22vw, 280px);
+      font-weight: 400;
+      letter-spacing: -.05em;
+      color: rgba(255,255,255,.025);
+      pointer-events: none;
+      user-select: none;
+      line-height: 1;
+    }
+
+    /* Horizontal hairline rows */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    }
+
+    .panel-top { position: relative; z-index: 2; }
+    .panel-bottom { position: relative; z-index: 2; }
+
+    /* Logo — identical to index */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 80px;
+    }
+
+    .logo-mark {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .logo-mark span {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .15em;
+      color: var(--muted);
+    }
+
+    .logo-text-wrap {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-name {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -.01em;
+      color: rgba(232,232,232,.9);
+    }
+
+    .logo-sub {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Heading like hero-title */
+    .left-heading {
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 300;
+      letter-spacing: -.04em;
+      line-height: 1.02;
+      margin-bottom: 24px;
+    }
+
+    .left-heading .accent {
+      font-family: var(--f-serif);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--muted);
+    }
+
+    .left-desc {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 320px;
+    }
+
+    /* Section label row — same as index */
+    .section-label-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .section-label-row span {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+      flex: 1;
+    }
+
+    /* Bottom meta row */
+    .bottom-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .meta-tag {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+    }
+
+    /* Dot indicator */
+    .live-dot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .2em;
+      color: var(--muted);
+    }
+
+    .live-dot::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--text);
+      opacity: .6;
+      animation: pulse-live 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-live {
+      0%, 100% { opacity: .6; }
+      50%       { opacity: .2; }
+    }
+
+    /* ─── RIGHT PANEL — auth side ──────────────── */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 64px;
+      position: relative;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ─── TABS ─────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0 0 16px;
+      background: none;
+      border: none;
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      cursor: pointer;
+      position: relative;
+      transition: color .3s;
+      text-align: left;
+    }
+
+    .tab-btn + .tab-btn { text-align: right; }
+
+    .tab-btn.active { color: var(--text); }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 1px;
+      background: var(--text);
+    }
+
+    .tab-btn:hover:not(.active) { color: rgba(232,232,232,.65); }
+
+    /* ─── FORM PANES ───────────────────────────── */
+    .form-pane { display: none; }
+    .form-pane.active { display: block; }
+
+    .form-eyebrow {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    /* ─── FIELDS ───────────────────────────────── */
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: block;
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--f-sans);
+      font-size: 14px;
+      font-weight: 300;
+      padding: 10px 0;
+      outline: none;
+      transition: border-color .3s;
+      caret-color: var(--text);
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder {
+      color: rgba(232,232,232,.18);
+      font-size: 13px;
+    }
+
+    .field input:focus {
+      border-bottom-color: var(--text);
+    }
+
+    /* ─── BUTTONS — same style as index ────────── */
+    .btn-primary {
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px 28px;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .18em;
+      cursor: pointer;
+      transition: opacity .3s;
+    }
+
+    .btn-primary:hover { opacity: .82; }
+    .btn-primary:disabled { opacity: .35; cursor: not-allowed; }
+
+    .btn-ghost {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px 24px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: rgba(232,232,232,.55);
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .18em;
+      cursor: pointer;
+      transition: border-color .3s, color .3s, background .3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border-hov);
+      color: var(--text);
+    }
+
+    .btn-ghost svg {
+      width: 14px; height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ─── DIVIDER ──────────────────────────────── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0 0;
+    }
+
+    .or-divider .line-d {
+      flex: 1; height: 1px;
+      background: var(--border);
+    }
+
+    .or-divider span {
+      font-family: var(--f-mono);
+      font-size: 8px;
+      letter-spacing: .25em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ─── ALERTS ───────────────────────────────── */
+    .loading-bar {
+      height: 1px;
+      background: var(--border);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .loading-bar.active { display: block; }
+
+    .loading-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -40%;
+      width: 40%; height: 100%;
+      background: linear-gradient(90deg, transparent, var(--text), transparent);
+      animation: loading-sweep .8s linear infinite;
+    }
+
+    @keyframes loading-sweep { to { left: 140%; } }
+
+    .auth-error {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+      color: rgba(255,100,100,.8);
+      border: 1px solid rgba(255,100,100,.15);
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .auth-error.show { display: block; }
+
+    .auth-success {
+      font-family: var(--f-mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+      color: rgba(232,232,232,.7);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .auth-success.show { display: block; }
+
+    /* ─── BACK LINK ────────────────────────────── */
+    .back-row {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-link {
+      font-family: var(--f-mono);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: var(--muted);
+      transition: color .3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-link:hover { color: var(--text); }
+
+    /* ─── SCROLL PROGRESS (top) ────────────────── */
+    #scroll-bar {
+      position: fixed; top: 0; left: 0; z-index: 500;
+      height: 1px; width: 0%;
+      background: var(--text);
+    }
+
+    /* ─── GSAP initial states ───────────────────── */
+    .gsap-fade { opacity: 0; }
+    .gsap-up   { opacity: 0; transform: translateY(24px); }
+
+    /* ─── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 860px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        overflow: auto;
+      }
+
+      .left-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 36px 32px;
+      }
+
+      .left-bg-glyph { display: none; }
+
+      .logo { margin-bottom: 40px; }
+
+      .left-heading { font-size: clamp(28px, 7vw, 40px); }
+
+      .right-panel { padding: 40px 32px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scroll-bar"></div>
+
+<!-- ─── LEFT PANEL ──────────────────────────── -->
+<div class="left-panel">
+
+  <div class="panel-top">
+    <!-- Logo -->
+    <div class="logo gsap-fade" id="logo">
+      <div class="logo-mark"><span>R7X</span></div>
+      <div class="logo-text-wrap">
+        <span class="logo-name">Rootrix Crew</span>
+        <span class="logo-sub">ELITE CTF TEAM</span>
+      </div>
+    </div>
+
+    <!-- Section label row -->
+    <div class="section-label-row gsap-fade" id="sect-label">
+      <span>01 — ACCESS PORTAL</span>
+      <div class="hairline"></div>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="left-heading gsap-up" id="left-heading">
+      Authenticate<br />
+      <em class="accent serif">your presence.</em>
+    </h1>
+
+    <p class="left-desc gsap-up" id="left-desc">
+      Only crew members and registered operators may access protected resources.
+      Sign in to continue, or register a new operator profile.
+    </p>
+  </div>
+
+  <div class="panel-bottom">
+    <div class="bottom-meta gsap-fade" id="bottom-meta">
+      <span class="meta-tag">RAMCO INSTITUTE OF TECHNOLOGY</span>
+      <span class="live-dot">SECURE</span>
+    </div>
+  </div>
+
+  <!-- Background glyph -->
+  <div class="left-bg-glyph">R7X</div>
+</div>
+
+<!-- ─── RIGHT PANEL ─────────────────────────── -->
+<div class="right-panel">
+  <div class="auth-container gsap-up" id="auth-container">
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabSignIn" onclick="switchTab('signin')">// SIGN_IN</button>
+      <button class="tab-btn" id="tabSignUp" onclick="switchTab('signup')">REGISTER //</button>
+    </div>
+
+    <!-- ── SIGN IN ── -->
+    <div class="form-pane active" id="paneSignIn">
+      <div class="form-eyebrow">AUTHENTICATE IDENTITY</div>
+
+      <div class="loading-bar" id="loadingSignIn"></div>
+      <div class="auth-error" id="errorSignIn"></div>
+      <div class="auth-success" id="successSignIn"></div>
+
+      <div class="field">
+        <label for="signInEmail">EMAIL_ADDRESS</label>
+        <input type="email" id="signInEmail" placeholder="operator@rootrix.crew" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="signInPassword">PASSPHRASE</label>
+        <input type="password" id="signInPassword" placeholder="••••••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="btn-primary" id="btnSignIn" onclick="handleSignIn()">
+        EXECUTE_AUTH
+      </button>
+
+      <div class="or-divider">
+        <div class="line-d"></div>
+        <span>OR CONTINUE WITH</span>
+        <div class="line-d"></div>
+      </div>
+
+      <button class="btn-ghost" id="btnGoogle" onclick="handleGoogleSignIn()">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        GOOGLE_OAUTH
+      </button>
+    </div>
+
+    <!-- ── SIGN UP ── -->
+    <div class="form-pane" id="paneSignUp">
+      <div class="form-eyebrow">CREATE OPERATOR PROFILE</div>
+
+      <div class="loading-bar" id="loadingSignUp"></div>
+      <div class="auth-error" id="errorSignUp"></div>
+      <div class="auth-success" id="successSignUp"></div>
+
+      <div class="field">
+        <label for="signUpUsername">USERNAME</label>
+        <input type="text" id="signUpUsername" placeholder="R7X_YourHandle" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="signUpEmail">EMAIL_ADDRESS</label>
+        <input type="email" id="signUpEmail" placeholder="operator@rootrix.crew" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="signUpPassword">PASSPHRASE</label>
+        <input type="password" id="signUpPassword" placeholder="••••••••••••" autocomplete="new-password" />
+      </div>
+
+      <button class="btn-primary" id="btnSignUp" onclick="handleSignUp()">
+        INITIALIZE_ACCOUNT
+      </button>
+
+      <div class="or-divider">
+        <div class="line-d"></div>
+        <span>OR CONTINUE WITH</span>
+        <div class="line-d"></div>
+      </div>
+
+      <button class="btn-ghost" onclick="handleGoogleSignIn()">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        GOOGLE_OAUTH
+      </button>
+    </div>
+
+    <!-- Back link -->
+    <div class="back-row gsap-fade" id="back-row">
+      <div style="height:1px;flex:1;background:var(--border)"></div>
+      <a href="../index.html" class="back-link">← RETURN TO MAINFRAME</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── SCRIPTS ──────────────────────────────── -->
+<script>
+  /* ── TAB SWITCHING ─────────────────────── */
+  function switchTab(tab) {
+    const isSignIn = tab === 'signin';
+    document.getElementById('tabSignIn').classList.toggle('active', isSignIn);
+    document.getElementById('tabSignUp').classList.toggle('active', !isSignIn);
+    document.getElementById('paneSignIn').classList.toggle('active', isSignIn);
+    document.getElementById('paneSignUp').classList.toggle('active', !isSignIn);
+  }
+
+  /* ── UI HELPERS ────────────────────────── */
+  function setLoading(id, state) {
+    document.getElementById(id).classList.toggle('active', state);
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = '✕  ' + msg;
+    el.className = 'auth-error show';
+  }
+
+  function showSuccess(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = '✓  ' + msg;
+    el.className = 'auth-success show';
+  }
+
+  function clearMessages(errId, okId) {
+    document.getElementById(errId).className = 'auth-error';
+    document.getElementById(okId).className = 'auth-success';
+  }
+
+  /* ── AUTH HANDLERS ─────────────────────── */
+  async function handleSignIn() {
+    const email = document.getElementById('signInEmail').value.trim();
+    const pass  = document.getElementById('signInPassword').value;
+    clearMessages('errorSignIn', 'successSignIn');
+    if (!email || !pass) { showError('errorSignIn', 'All fields required'); return; }
+    setLoading('loadingSignIn', true);
+    document.getElementById('btnSignIn').disabled = true;
+    try {
+      if (window._authHandlers?.signIn) {
+        await window._authHandlers.signIn(email, pass);
+        showSuccess('successSignIn', 'Access granted — redirecting...');
+      } else {
+        document.dispatchEvent(new CustomEvent('r7x:signin', { detail: { email, pass } }));
+      }
+    } catch(e) {
+      showError('errorSignIn', e.message || 'Authentication failed');
+    } finally {
+      setLoading('loadingSignIn', false);
+      document.getElementById('btnSignIn').disabled = false;
+    }
+  }
+
+  async function handleSignUp() {
+    const username = document.getElementById('signUpUsername').value.trim();
+    const email    = document.getElementById('signUpEmail').value.trim();
+    const pass     = document.getElementById('signUpPassword').value;
+    clearMessages('errorSignUp', 'successSignUp');
+    if (!username || !email || !pass) { showError('errorSignUp', 'All fields required'); return; }
+    if (pass.length < 6) { showError('errorSignUp', 'Passphrase must be ≥ 6 characters'); return; }
+    setLoading('loadingSignUp', true);
+    document.getElementById('btnSignUp').disabled = true;
+    try {
+      if (window._authHandlers?.signUp) {
+        await window._authHandlers.signUp(email, pass, username);
+        showSuccess('successSignUp', 'Account initialized — welcome, operator.');
+      } else {
+        document.dispatchEvent(new CustomEvent('r7x:signup', { detail: { email, pass, username } }));
+      }
+    } catch(e) {
+      showError('errorSignUp', e.message || 'Registration failed');
+    } finally {
+      setLoading('loadingSignUp', false);
+      document.getElementById('btnSignUp').disabled = false;
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    if (window._authHandlers?.google) {
+      try { await window._authHandlers.google(); }
+      catch(e) { showError('errorSignIn', e.message || 'Google auth failed'); }
+    } else {
+      document.dispatchEvent(new CustomEvent('r7x:google'));
+    }
+  }
+
+  /* ── Enter key ────────────────────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('paneSignIn').classList.contains('active')) handleSignIn();
+    else handleSignUp();
+  });
+
+  /* ── GSAP ENTRANCE ─────────────────────── */
+  gsap.to('#logo',         { opacity: 1, duration: .8, delay: .1, ease: 'power2.out' });
+  gsap.to('#sect-label',   { opacity: 1, duration: .8, delay: .25, ease: 'power2.out' });
+  gsap.to('#left-heading', { opacity: 1, y: 0, duration: 1, delay: .4, ease: 'power3.out' });
+  gsap.to('#left-desc',    { opacity: 1, y: 0, duration: 1, delay: .55, ease: 'power3.out' });
+  gsap.to('#bottom-meta',  { opacity: 1, duration: .8, delay: .7, ease: 'power2.out' });
+  gsap.to('#auth-container', { opacity: 1, y: 0, duration: 1, delay: .5, ease: 'power3.out' });
+  gsap.to('#back-row',     { opacity: 1, duration: .8, delay: .9, ease: 'power2.out' });
+</script>
+
+<!-- Firebase auth module -->
+<script type="module" src="../js/login.js"></script>
+
+</body>
+</html>

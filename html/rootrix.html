@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rootrix Protocol: Reckoning</title>
+  <link href="https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #00ffcc;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 3rem;
+    }
+    input, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      background-color: #111;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      margin-top: 1rem;
+    }
+    button {
+      cursor: pointer;
+    }
+    #message {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+    }
+    .hidden {
+      display: none;
+    }
+    .choice {
+      margin-top: 2rem;
+    }
+    .choice button {
+      margin: 0.5rem;
+      background-color: #ff66cc;
+      color: #000;
+    }
+    .ending {
+      margin-top: 2rem;
+      font-style: italic;
+      color: #ffcc00;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧿 Rootrix Protocol: Reckoning</h1>
+  <p>Enter the final flag to awaken the Architect’s truth.</p>
+
+  <input type="text" id="flagInput" placeholder="R7X{...}" />
+  <button onclick="validateFlag()">Submit</button>
+
+  <div id="message"></div>
+
+  <div id="choices" class="choice hidden">
+    <p>You've seen the scars. Now choose your fate:</p>
+    <button onclick="rebuild()">🛠️ Rebuild the Rootrix</button>
+    <button onclick="destroy()">🔥 Destroy the System</button>
+  </div>
+
+  <div id="ending" class="ending hidden"></div>
+
+  <script>
+    function validateFlag() {
+      const input = document.getElementById("flagInput").value.trim();
+      const message = document.getElementById("message");
+      const choices = document.getElementById("choices");
+      const ending = document.getElementById("ending");
+
+      if (input === "R7X{system_restored}") {
+        message.textContent = "✅ Flag accepted. The Architect awakens.";
+        choices.classList.remove("hidden");
+        ending.classList.add("hidden");
+      } else {
+        message.textContent = "❌ Incorrect flag. The system remains fractured.";
+        choices.classList.add("hidden");
+        ending.classList.add("hidden");
+      }
+    }
+
+    function rebuild() {
+      const ending = document.getElementById("ending");
+      ending.innerHTML = `
+        <h2>🛠️ Restoration Chosen</h2>
+        <p>The Architect nods. You are not his enemy—you are his heir.</p>
+        <p>The Rootrix will rise again, built on curiosity, emotion, and myth.</p>
+        <a href="https://rootrix-crew.github.io/recruitment-form.html">⚔️ Join the Crew</a>
+      `;
+      ending.classList.remove("hidden");
+    }
+
+    function destroy() {
+      const ending = document.getElementById("ending");
+      ending.innerHTML = `
+        <h2>🔥 Destruction Chosen</h2>
+        <p>The Architect smiles. You understand the pain. You choose fire.</p>
+        <p>The system collapses. From its ashes, a new protocol will rise.</p>
+        <a href="https://rootrix-crew.github.io/rogue-protocol.html">🧨 Begin the Rogue Protocol</a>
+      `;
+      ending.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
