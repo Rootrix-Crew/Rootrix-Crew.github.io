@@ -1193,6 +1193,53 @@
       .footer-inner { grid-template-columns: 1fr; gap: 40px; }
       .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
       .join-cta-block { grid-template-columns: 1fr; }
+
+      /* Mobile section padding */
+      section, #home, #stats, #about, #achievements, #blog, #join {
+        padding: 80px 0 !important;
+      }
+
+      .stat-cell { padding: 32px 20px; }
+      .achievement-item { padding: 12px; }
+      .achievement-icon-wrap { width: 32px; height: 32px; font-size: 16px; margin-right: 12px; }
+      .achievement-title { font-size: 15px; }
+      .achievement-desc { font-size: 12px; }
+
+      .modal-box { width: 95%; max-height: 90vh; margin: 20px; }
+      .modal-section { padding: 20px 16px; }
+      .field-row { flex-direction: column; }
+      .btn { padding: 12px 20px; font-size: 12px; min-height: 44px; }
+
+      .hero-subtitle { font-size: 14px; }
+      .section-title { font-size: 28px; }
+      .section-subtitle { font-size: 13px; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-inner { padding: 14px 16px; }
+      .logo-mark { width: 30px; height: 30px; }
+      .logo-text { font-size: 14px; }
+
+      .hero-title { font-size: clamp(32px, 14vw, 48px); }
+      .hero-cta { flex-direction: column; gap: 12px; }
+      .hero-cta .btn { width: 100%; }
+
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-cell { padding: 24px 16px; }
+      .stat-value { font-size: 36px; }
+      .stat-label { font-size: 11px; }
+
+      .about-intro, .achievements-intro, .join-cta-block { grid-template-columns: 1fr; gap: 24px; }
+      .about-img { min-height: 200px; }
+
+      .achievement-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .achievement-item-header { width: 100%; }
+
+      .writeup-item, .event-item { padding: 16px; }
+
+      .footer-links { flex-direction: column; gap: 16px; text-align: center; }
+      .admin-nav { padding: 12px; }
+      .admin-btn { padding: 10px 12px; font-size: 11px; }
     }
 
     /* ─── GSAP initial states ────────────────── */
