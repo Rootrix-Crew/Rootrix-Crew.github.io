@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' https://www.gstatic.com https://www.googleapis.com 'unsafe-eval';
+               connect-src https://firestore.googleapis.com https://www.googleapis.com;
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;">
   <title>Rootrix Crew — Elite CTF Team</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1209,17 +1215,17 @@
       <form id="addAchievementForm">
         <div class="field-row">
           <div class="field">
-            <label>TITLE</label>
+            <label for="achievementTitle">TITLE</label>
             <input type="text" id="achievementTitle" required />
           </div>
           <div class="field">
-            <label>PLACE / POSITION</label>
+            <label for="achievementPlace">PLACE / POSITION</label>
             <input type="text" id="achievementPlace" placeholder="e.g. 1st Place" />
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>ICON</label>
+            <label for="achievementIcon">ICON</label>
             <select id="achievementIcon" required>
               <option value="🏆">🏆 Gold Trophy</option>
               <option value="🥈">🥈 Silver</option>
@@ -1230,12 +1236,12 @@
             </select>
           </div>
           <div class="field">
-            <label>DATE</label>
+            <label for="achievementDate">DATE</label>
             <input type="text" id="achievementDate" required />
           </div>
         </div>
         <div class="field">
-          <label>DESCRIPTION</label>
+          <label for="achievementDescription">DESCRIPTION</label>
           <textarea id="achievementDescription" required></textarea>
         </div>
         <button type="submit" class="btn-submit">ADD ACHIEVEMENT</button>
@@ -1260,16 +1266,16 @@
       <form id="addEventForm">
         <div class="field-row">
           <div class="field">
-            <label>TITLE</label>
+            <label for="eventTitle">TITLE</label>
             <input type="text" id="eventTitle" required />
           </div>
           <div class="field">
-            <label>DATE</label>
+            <label for="eventDate">DATE</label>
             <input type="text" id="eventDate" placeholder="e.g. Oct 15, 2025" required />
           </div>
         </div>
         <div class="field">
-          <label>DESCRIPTION</label>
+          <label for="eventDescription">DESCRIPTION</label>
           <textarea id="eventDescription" required></textarea>
         </div>
         <button type="submit" class="btn-submit">ADD EVENT</button>
@@ -1294,11 +1300,11 @@
       <form id="addWriteupForm">
         <div class="field-row">
           <div class="field">
-            <label>TITLE</label>
+            <label for="writeupTitle">TITLE</label>
             <input type="text" id="writeupTitle" required />
           </div>
           <div class="field">
-            <label>TYPE</label>
+            <label for="writeupType">TYPE</label>
             <select id="writeupType" required>
               <option value="CTF">CTF</option>
               <option value="PoC">PoC</option>
@@ -1308,7 +1314,7 @@
         </div>
         <div class="field-row">
           <div class="field">
-            <label>TOPIC</label>
+            <label for="writeupTopic">TOPIC</label>
             <select id="writeupTopic" required>
               <option value="Web Exploit">Web Exploit</option>
               <option value="Reverse">Reverse</option>
@@ -1318,12 +1324,12 @@
             </select>
           </div>
           <div class="field">
-            <label>WRITEUP URL</label>
+            <label for="writeupUrl">WRITEUP URL</label>
             <input type="url" id="writeupUrl" required />
           </div>
         </div>
         <div class="field">
-          <label>DESCRIPTION</label>
+          <label for="writeupDescription">DESCRIPTION</label>
           <textarea id="writeupDescription" required></textarea>
         </div>
         <button type="submit" class="btn-submit">ADD WRITEUP</button>
@@ -1900,7 +1906,7 @@
           <div class="list-item-name">${a.icon || '🏆'} ${a.title}</div>
           <div class="list-item-sub">${a.date} ${a.place ? '· ' + a.place : ''}</div>
         </div>
-        <button class="btn-delete" onclick="deleteItem('achievements','${a.id}')">DELETE</button>
+      <button class="btn-delete" onclick="deleteItem('Card','${a.id}')">DELETE</button>
       </div>
     `).join('');
   }
@@ -1943,12 +1949,17 @@
   /* ── Data loading ─────────────────────────── */
   async function loadAll() {
     try {
+      console.log("Loading achievements...");
       const [aDocs, wDocs, eDocs] = await Promise.all([
-        getDocs(query(collection(db,'achievements'), orderBy('date','desc'))),
+        getDocs(collection(db,'Card')),
         getDocs(query(collection(db,'writeups'), orderBy('createdAt','desc'))),
-        getDocs(query(collection(db,'events'), orderBy('date','asc')))
+        getDocs(collection(db,'events'))
       ]);
-      const achievements = aDocs.docs.map(d => ({id:d.id,...d.data()}));
+      const achievements = aDocs.docs.map(d => {
+        const data = d.data();
+        console.log(data);
+        return {id:d.id,...data};
+      });
       const writeups     = wDocs.docs.map(d => ({id:d.id,...d.data()}));
       const events       = eDocs.docs.map(d => ({id:d.id,...d.data()}));
       renderAchievements(achievements);
@@ -1991,7 +2002,7 @@
   /* ── Form handlers ────────────────────────── */
   document.getElementById('addAchievementForm').addEventListener('submit', async e => {
     e.preventDefault();
-    await addDoc(collection(db,'achievements'), {
+    await addDoc(collection(db,'Card'), {
       title:       document.getElementById('achievementTitle').value,
       place:       document.getElementById('achievementPlace').value,
       icon:        document.getElementById('achievementIcon').value,
